@@ -1,0 +1,153 @@
+{
+	"info": {
+		"_postman_id": "b34e0343-f225-4914-b4ca-647894c4af27",
+		"name": "ClarusIdsAgent",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "6046175"
+	},
+	"item": [
+		{
+			"name": "ping",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{agent-endpoint-ip-local}}:{{agent-endpoint-port}}/api/ping",
+					"protocol": "http",
+					"host": [
+						"{{agent-endpoint-ip-local}}"
+					],
+					"port": "{{agent-endpoint-port}}",
+					"path": [
+						"api",
+						"ping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getExpIDSDescription",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{agent-endpoint-ip}}:{{agent-endpoint-port}}/api/provider/asset?exp_id={TO-COMPLETE}",
+					"protocol": "http",
+					"host": [
+						"{{agent-endpoint-ip}}"
+					],
+					"port": "{{agent-endpoint-port}}",
+					"path": [
+						"api",
+						"provider",
+						"asset"
+					],
+					"query": [
+						{
+							"key": "exp_id",
+							"value": "{TO-COMPLETE}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createExpIDSAsset",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"exp_id\": \"UC01\",\r\n  \"exp_description\": \"Big wine\",\r\n  \"asset_type\": \"dataset\",\r\n  \"minio_endpoint\": \"34.251.246.165:9000\",\r\n  \"minio_bucket\": \"datasets\",\r\n  \"minio_path\": \"usecase01/wine_data_100mb.csv\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{agent-endpoint-ip}}:{{agent-endpoint-port}}/api/provider/asset",
+					"protocol": "http",
+					"host": [
+						"{{agent-endpoint-ip}}"
+					],
+					"port": "{{agent-endpoint-port}}",
+					"path": [
+						"api",
+						"provider",
+						"asset"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteExpIDSAsset",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://{{agent-endpoint-ip}}:{{agent-endpoint-port}}/api/provider/asset?exp_id=UC01&asset_type=dataset",
+					"protocol": "http",
+					"host": [
+						"{{agent-endpoint-ip}}"
+					],
+					"port": "{{agent-endpoint-port}}",
+					"path": [
+						"api",
+						"provider",
+						"asset"
+					],
+					"query": [
+						{
+							"key": "exp_id",
+							"value": "UC01"
+						},
+						{
+							"key": "asset_type",
+							"value": "dataset"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAssetArtifact",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{agent-endpoint-ip-local}}:{{agent-endpoint-port}}/api/consumer/asset?exp_id=UC01&asset_type=dataset&provider_ip=34.251.246.165",
+					"protocol": "http",
+					"host": [
+						"{{agent-endpoint-ip-local}}"
+					],
+					"port": "{{agent-endpoint-port}}",
+					"path": [
+						"api",
+						"consumer",
+						"asset"
+					],
+					"query": [
+						{
+							"key": "exp_id",
+							"value": "UC01"
+						},
+						{
+							"key": "asset_type",
+							"value": "dataset"
+						},
+						{
+							"key": "provider_ip",
+							"value": "34.251.246.165"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
