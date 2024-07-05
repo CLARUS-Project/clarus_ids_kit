@@ -12,10 +12,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{agent-endpoint-ip-local}}:{{agent-endpoint-port}}/api/ping",
+					"raw": "http://{{agent-endpoint-ip-mlops}}:{{agent-endpoint-port}}/api/ping",
 					"protocol": "http",
 					"host": [
-						"{{agent-endpoint-ip-local}}"
+						"{{agent-endpoint-ip-mlops}}"
 					],
 					"port": "{{agent-endpoint-port}}",
 					"path": [
@@ -32,10 +32,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{agent-endpoint-ip}}:{{agent-endpoint-port}}/api/provider/asset?exp_id={TO-COMPLETE}",
+					"raw": "http://{{agent-endpoint-ip-edge}}:{{agent-endpoint-port}}/api/provider/asset?exp_id={TO-COMPLETE}",
 					"protocol": "http",
 					"host": [
-						"{{agent-endpoint-ip}}"
+						"{{agent-endpoint-ip-edge}}"
 					],
 					"port": "{{agent-endpoint-port}}",
 					"path": [
@@ -48,6 +48,27 @@
 							"key": "exp_id",
 							"value": "{TO-COMPLETE}"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAllExpIdDescription",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{agent-endpoint-ip-edge}}:{{agent-endpoint-port}}/api/provider/assets",
+					"protocol": "http",
+					"host": [
+						"{{agent-endpoint-ip-edge}}"
+					],
+					"port": "{{agent-endpoint-port}}",
+					"path": [
+						"api",
+						"provider",
+						"assets"
 					]
 				}
 			},
@@ -68,10 +89,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{agent-endpoint-ip}}:{{agent-endpoint-port}}/api/provider/asset",
+					"raw": "http://{{agent-endpoint-ip-edge}}:{{agent-endpoint-port}}/api/provider/asset",
 					"protocol": "http",
 					"host": [
-						"{{agent-endpoint-ip}}"
+						"{{agent-endpoint-ip-edge}}"
 					],
 					"port": "{{agent-endpoint-port}}",
 					"path": [
@@ -89,10 +110,10 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://{{agent-endpoint-ip}}:{{agent-endpoint-port}}/api/provider/asset?exp_id=UC01&asset_type=dataset",
+					"raw": "http://{{agent-endpoint-ip-edge}}:{{agent-endpoint-port}}/api/provider/asset?exp_id=UC01&asset_type=dataset",
 					"protocol": "http",
 					"host": [
-						"{{agent-endpoint-ip}}"
+						"{{agent-endpoint-ip-edge}}"
 					],
 					"port": "{{agent-endpoint-port}}",
 					"path": [
@@ -120,10 +141,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{agent-endpoint-ip-local}}:{{agent-endpoint-port}}/api/consumer/asset?exp_id=UC01&asset_type=dataset&provider_ip=34.251.246.165",
+					"raw": "http://{{agent-endpoint-ip-mlops}}:{{agent-endpoint-port}}/api/consumer/asset?exp_id=UC01&asset_type=dataset&provider_ip=34.251.246.165",
 					"protocol": "http",
 					"host": [
-						"{{agent-endpoint-ip-local}}"
+						"{{agent-endpoint-ip-mlops}}"
 					],
 					"port": "{{agent-endpoint-port}}",
 					"path": [
