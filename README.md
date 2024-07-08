@@ -20,7 +20,7 @@ The repository also contains an additional docker compose file to deploy also a 
       - [Datapp properties configuration](#datapp-properties-configuration)
       - [Environment variables configuration](#environment-variables-configuration)
     - [Start services](#start-services)
-  - [Usage to share datasets within Clarus Data Space](#usage-to-share-datasets-within-clarus-data-space)
+  - [How to use to share datasets within Clarus Data Space](#how-to-use-to-share-datasets-within-clarus-data-space)
 
 ## Requirements
 - Linux machine with public IP with 8 GB RAM and 70 GB Disk 
@@ -226,7 +226,7 @@ This screen will show your experiments (datasets) already registered wthin the C
 You can use the REGISTER menu to register a new dataset in the ids connector. Click in the menu and the next screen will appear
 ![hmi_02](images/HMI_02.png)
 
-- Experiment ID: Unique identifier for the experiment(dataset).It should be the same as used in the dag configuration.
+- Experiment ID: Unique identifier for the experiment(dataset).It should be the same as the one used as experimentID in the dag configuration.
 - Description: Description for the dataset. 
 - Type: Choose dataset from the combobox
 - MinioEndpoint: IP and port of the MiniIO server where the datasets are saved (<<IP>>:<<port>>)
