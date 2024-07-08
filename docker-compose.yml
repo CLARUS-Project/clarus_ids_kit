@@ -43,6 +43,10 @@ services:
       - TRUSTORE_PASSWORD=${TRUSTORE_PASSWORD}
       - FIREWALL=${PROVIDER_ECC_FIREWALL}
       - TZ=Europe/Rome
+
+    expose:
+       - "8887"
+
     volumes:
       - ./ecc_resources_provider:/config
       - ./ecc_cert:/cert
@@ -179,6 +183,16 @@ services:
       options:
         max-size: "50m"
         max-file: "5"
+
+  clarus-hmi:
+
+        image: clarusproject/clarus_hmi:0.2.0
+        container_name: clarus-hmi
+        hostname: clarus-hmi
+        ports:
+            - 3000:3000
+        networks: 
+          - clarus_network
 
 
 networks:

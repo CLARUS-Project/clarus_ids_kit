@@ -3,19 +3,23 @@
 This repository contains the docker-compose file and the configuration files and folders needed to deploy (as a provider connector) a TRueConnector using SFTP protocol  and a clarus agent to manage the connector and register clarus assets ( datasets, models, docker compose files).
 The repository also contains an additional docker compose file to deploy also a MinIO server that can be used to save the pilots datasets.
 
+
+## Table of Contents <!-- omit in toc -->
+
+
 - [clarus\_ids\_kit](#clarus_ids_kit)
   - [Requirements](#requirements)
   - [Components](#components)
   - [Deployment](#deployment)
-  - [Clone repository](#clone-repository)
-  - [Certificates generation](#certificates-generation)
-  - [DAPS certificate generation](#daps-certificate-generation)
-  - [TRue Connector certificate generation](#true-connector-certificate-generation)
-  - [Configuration](#configuration)
-  - [Ecc properties configuration](#ecc-properties-configuration)
-  - [Datapp properties configuration](#datapp-properties-configuration)
-  - [Environment variables configuration](#environment-variables-configuration)
-  - [Start services](#start-services)
+    - [Clone repository](#clone-repository)
+    - [Certificates generation](#certificates-generation)
+      - [DAPS certificate generation](#daps-certificate-generation)
+      - [TRue Connector certificate generation](#true-connector-certificate-generation)
+    - [Configuration](#configuration)
+      - [Ecc properties configuration](#ecc-properties-configuration)
+      - [Datapp properties configuration](#datapp-properties-configuration)
+      - [Environment variables configuration](#environment-variables-configuration)
+    - [Start services](#start-services)
   - [Usage to share datasets within Clarus Data Space](#usage-to-share-datasets-within-clarus-data-space)
 
 ## Requirements
@@ -34,14 +38,14 @@ A brief description of the clarus_ids_kit components:
 
 - clarus_ids_agent: service that provides diferent endpoints to make easier the management of TRueConnector. It is also in charge of moving datasets from MinIO to dataapp datalake.
 
-- clarus-ui: Frontend that consumes clarus_ids_agent endpoints. It allows the user to register, delete and view the shared datasets within the Clarus Data Space. Not completly finished yet.
+- clarus-hmi: Frontend that consumes clarus_ids_agent endpoints. It allows the user to register, delete and view the metamodel for shared datasets within the Clarus Data Space.
 
 - MinIO server: Optional component that can be used by pilot to save their datasets instead of using its own.
   
 ## Deployment 
-The content needed for the deployment is available in the Clarus github repository https://github.com/CLARUS-Project and in the Clarus docker hub repository https://hub.docker.com/repositories/clarusproject.
-The credentials are saved in the Polimi repository.
-## Clone repository
+The content needed for the deployment is available in the Clarus github repository https://github.com/CLARUS-Project and the images used are in the Clarus docker hub repository https://hub.docker.com/repositories/clarusproject.
+The credentials to pull images from docker hub  are saved in the Polimi repository.
+### Clone repository
 - Clone clarus_ids_kit
     ```
     ./git clone https://github.com/CLARUS-Project/clarus_ids_kit.git
@@ -64,16 +68,17 @@ Once repository is cloned you should see next folder tree
 - docker-compose-minio.yml: MinIO server is added to the basic services
 - prepopulate_be_dataapp_data_provider.sh: Not used currently
 - renew_daps_certificate.sh: script to renew the Daps certificate when it expires.
-- TRUE Connector v1.postman_collection: Collection that can be imported in Postman tool to manage the TRueConnector 
-- ClarusIdsAgent.postman_collection: Collection that can be imported in Postman tool to make easier the registration of clarus assets. These requests will be used by the clarus-ui.
+- ClarusIdsAgent.postman_collection: Collection that can be imported in Postman tool to make easier the registration of clarus assets. These requests will be used by the clarus-hmi.
+- TRUE Connector v1.postman_collection: Collection that can be imported in Postman tool to manage directly the TRueConnector. Not needed if you use the ClarusIdsAgent.postman_collection.
+
   
 **Make sure permissions for folder ecc_cer & be-dataapp_data_provider are set to 777**
-## Certificates generation
+### Certificates generation
 
 All the certificates used by the TRue Connector are stored in the keystore ssl-server.jks and in the truststore truststore.jks located in the folder ecc_cert. 
 The connector uses the identity provider (DAPS) deployed in the Clarus Data Space. A certificate is needed to authenticate within this Identity Provider.
 The connector also needs another certificate to be able to share data with the connector deployed in the MLOps platform and registered also in the Clarus Data Space. 
-## DAPS certificate generation
+#### DAPS certificate generation
  The following steps and examples describe the sequence of operations. The names in italics and bold are only as examples.
 1.	Create certificate for sharing with DAPS
 
@@ -101,7 +106,7 @@ The connector also needs another certificate to be able to share data with the c
     ./renew_daps_certificate.sh
     ```   
 
-## TRue Connector certificate generation 
+#### TRue Connector certificate generation 
 The following steps and examples describe the sequence of operations. The names in italics and bold are only as examples.
 1.	Create public/private key in keystore
 
@@ -125,11 +130,11 @@ The following steps and examples describe the sequence of operations. The names 
 5.	Import in your truststore
     
     keytool -import -v -trustcacerts -alias ***xx-tc-mlops*** -file ***xx-tc-mlops***.cer -keystore truststoreEcc.jks -keypass changeit -storepass allpassword
-## Configuration
+### Configuration
 Several configuration files are needed to adjust the behaviour of the various TrueConnector components.  In addition, an environment variables file eases this configuration.
-## Ecc properties configuration
+#### Ecc properties configuration
 The ecc configuration files can be found in the ecc_resources_provider folder.  The TRueConnector execution core (ecc) is configured to use the DAPS of the Clarus dataspace (mvds-clarus.eu) as identity provider. The ecc is also configured to use the web sockets protocol as ids protocol. The default values of these files are fine and no modification is required.
-## Datapp properties configuration
+#### Datapp properties configuration
 The dataapp configuration files can be found in the be-dataapp_resources folder. The default values are fine and only the settings regarding the SFTP server need to be set in the file application-docker.properties.
   - The public IP where the SFTP server is available needs to be set (public IP of the machine where the conector is deployed). 
   
@@ -139,7 +144,7 @@ The dataapp configuration files can be found in the be-dataapp_resources folder.
    ```
 
 
-## Environment variables configuration
+#### Environment variables configuration
 The .env file contains the enviromental variables needed both for the TRueConnector & clarus agent.
 Only the sections regarding with TLS certificates, DAPS certiifcates and agent configuration shall be modified.
 
@@ -171,7 +176,7 @@ PROVIDER_DAPS_KEYSTORE_ALIAS=<<DAPS CERTIFICATE ALIAS>>
 ECC_PROVIDER_IP = ecc-provider  
 ECC_PROVIDER_PORT = 8449
 PROXY_CONSUMER_IP = be-dataapp-consumer
-PROXY_CONSUMER_PORT = 8103
+PROXY_CONSUMER_PORT = 8183
 ECC_CONSUMER_IP = ecc-consumer
 ECC_CONSUMER_PORT = 8887
 ECC_PROVIDER_EXTERNAL_PORT = 8086
@@ -183,7 +188,7 @@ MINIO_PASSWORD = <<MinIO password>>
 
  ````
 
-## Start services
+### Start services
 Move to the folder where the repo has been cloned.
 - Login in Dockerhub using the clarusproject credentials provided in the project
     ```
@@ -204,9 +209,29 @@ You shall see next services up:
 
 ![clarus_ids_kit_services](images/clarus_ids_kit_services.png)
 
-## Usage to share datasets within Clarus Data Space
+## How to use to share datasets within Clarus Data Space
 
+Once the services are up and running clarus-hmi frontend is avilable in port 3000. Use an internet browser and navigate to:
 
+    ```
+    http://<<IP where clarus_ids_kit has been deployed>>:3000
+    ```
 
+Next screen will be shown:
 
+![hmi_01](images/HMI_01.png)
 
+This screen will show your experiments (datasets) already registered wthin the Clarus DatSpace. 
+
+You can use the REGISTER menu to register a new dataset in the ids connector. Click in the menu and the next screen will appear
+![hmi_02](images/HMI_02.png)
+
+- Experiment ID: Unique identifier for the experiment(dataset).It should be the same as used in the dag configuration.
+- Description: Description for the dataset. 
+- Type: Choose dataset from the combobox
+- MinioEndpoint: IP and port of the MiniIO server where the datasets are saved (<<IP>>:<<port>>)
+- Bucket: Bucket where the dataset is saved. (i.e datasets)
+- Path: path of the dataset. (i.e usecase01\mydataset.csv)
+
+When click in an ids resource, it is posible to stop sharing the dataset through ids just by clicking on the DELETE button
+![hmi_03](images/HMI_03.png)

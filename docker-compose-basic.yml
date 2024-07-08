@@ -43,6 +43,10 @@ services:
       - TRUSTORE_PASSWORD=${TRUSTORE_PASSWORD}
       - FIREWALL=${PROVIDER_ECC_FIREWALL}
       - TZ=Europe/Rome
+
+    expose:
+       - "8887"
+
     volumes:
       - ./ecc_resources_provider:/config
       - ./ecc_cert:/cert
@@ -102,7 +106,7 @@ services:
 
   be-dataapp-provider:
     #image: rdlabengpa/ids_be_data_app:v0.3.2
-    image: clarusproject/clarus_data_stfp_app:0.0.2
+    image: clarusproject/clarus_data_stfp_app:0.0.3
     #image: clarus_webserver_data_app:0.1.0
     deploy:
       resources:
@@ -180,6 +184,16 @@ services:
         max-size: "50m"
         max-file: "5"
 
+  clarus-hmi:
+
+        image: clarusproject/clarus_hmi:0.2.0
+        container_name: clarus-hmi
+        hostname: clarus-hmi
+        ports:
+            - 3000:3000
+        networks: 
+          - clarus_network
+
 
 networks:
   clarus_network: { }
@@ -190,4 +204,5 @@ volumes:
     uc_provider_data: {}
     #be_dataapp_provider_data:
      #external: true
+   
    
