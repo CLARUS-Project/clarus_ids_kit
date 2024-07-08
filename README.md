@@ -84,7 +84,7 @@ The connector also needs another certificate to be able to share data with the c
 
     openssl req -x509 -nodes -newkey rsa:2048 -keyout ***xx-daps-edge***.key -out ***xx-daps-edge***.cert -sha256 -days 365 -subj "/C=***ES***/ST=***Spain***/L=***GI***/O=***IKERLAN***/OU=***IPD***/CN=***xx-daps-edge-cn***” -addtext "subjectAltName = DNS:***your public DNS or IP***" 
     
-2.	Send ***xx-daps-edge***.cert to DAPS operator
+2.	Send ***xx-daps-edge***.cert to DAPS operator (luigi.dicorrado@eng.it)
 
 3.	Generate a .p12 using the key/cert pair you created at step 1, (set a password when prompted) and save it at ecc_cert folder
  
@@ -113,7 +113,7 @@ The following steps and examples describe the sequence of operations. The names 
     
     keytool -genkey -alias ***xx-tc-edge*** -keyalg RSA -keypass changeit -storepass changeit -keystore ssl-server.jks -ext SAN=ip:***your public IP***, dns:uc-dataapp-provider,dns:ecc-provider,dns:be-dataapp-provider 
     
-2.	Export certificate
+2.	Export certificate. 
 
     
     keytool -export -alias ***xx-tc-edge***  -storepass changeit  -file ***xx-tc-edge***.cer -keystore ssl-server.jks 
@@ -125,7 +125,7 @@ The following steps and examples describe the sequence of operations. The names 
     keytool -import -v -trustcacerts -alias ***xx-tc-edge*** -file ***xx-tc-edge***.cer -keystore truststoreEcc.jks -keypass changeit -storepass allpassword 
         
 
-4.	Get TRueConnector public certificate from  MLOps cloud platform 
+4.	Send exported certificate in step 2 to MLOps platform operator (bkremer@ikerlan.es) and get TRueConnector public certificate from  MLOps cloud platform.
 
 5.	Import in your truststore
     
