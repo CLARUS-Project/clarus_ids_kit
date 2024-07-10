@@ -20,7 +20,7 @@ The repository also contains an additional docker compose file to deploy also a 
       - [Datapp properties configuration](#datapp-properties-configuration)
       - [Environment variables configuration](#environment-variables-configuration)
     - [Start services](#start-services)
-  - [How to use to share datasets within Clarus Data Space](#how-to-use-to-share-datasets-within-clarus-data-space)
+  - [How to share datasets within Clarus Data Space](#how-to-share-datasets-within-clarus-data-space)
 
 ## Requirements
 - Linux machine with public IP with 8 GB RAM and 70 GB Disk 
@@ -68,7 +68,7 @@ Once repository is cloned you should see next folder tree
 - docker-compose-minio.yml: MinIO server is added to the basic services
 - prepopulate_be_dataapp_data_provider.sh: Not used currently
 - renew_daps_certificate.sh: script to renew the Daps certificate when it expires.
-- ClarusIdsAgent.postman_collection: Collection that can be imported in Postman tool to make easier the registration of clarus assets. These requests will be used by the clarus-hmi.
+- ClarusIdsAgent.postman_collection: Collection that can be imported in Postman tool to make easier the registration of clarus assets. These requests will be used by the clarus-hmi. It is possible to use Postman instead of clarus-hmi. 
 - TRUE Connector v1.postman_collection: Collection that can be imported in Postman tool to manage directly the TRueConnector. Not needed if you use the ClarusIdsAgent.postman_collection.
 
   
@@ -209,7 +209,7 @@ You shall see next services up:
 
 ![clarus_ids_kit_services](images/clarus_ids_kit_services.png)
 
-## How to use to share datasets within Clarus Data Space
+## How to share datasets within Clarus Data Space
 
 Once the services are up and running clarus-hmi frontend is avilable in port 3000. Use an internet browser and navigate to:
 
