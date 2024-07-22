@@ -12,10 +12,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{agent-endpoint-ip-mlops}}:{{agent-endpoint-port}}/api/ping",
+					"raw": "http://{{agent-endpoint-ip-local}}:{{agent-endpoint-port}}/api/ping",
 					"protocol": "http",
 					"host": [
-						"{{agent-endpoint-ip-mlops}}"
+						"{{agent-endpoint-ip-local}}"
 					],
 					"port": "{{agent-endpoint-port}}",
 					"path": [
@@ -81,7 +81,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \"exp_id\": \"UC01\",\r\n  \"exp_description\": \"Big wine\",\r\n  \"asset_type\": \"dataset\",\r\n  \"minio_endpoint\": \"34.251.246.165:9000\",\r\n  \"minio_bucket\": \"datasets\",\r\n  \"minio_path\": \"usecase01/wine_data_100mb.csv\"\r\n}",
+					"raw": "{ \"exp_id\": \"UC05\",\r\n  \"exp_description\": \"Big wine\",\r\n  \"asset_type\": \"dataset\",\r\n  \"minio_endpoint\": \"34.251.246.165:9000\",\r\n  \"minio_bucket\": \"datasets\",\r\n  \"minio_path\": \"usecase01/wine_data_100mb.csv\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -110,7 +110,7 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://{{agent-endpoint-ip-edge}}:{{agent-endpoint-port}}/api/provider/asset?exp_id=UC01&asset_type=dataset",
+					"raw": "http://{{agent-endpoint-ip-edge}}:{{agent-endpoint-port}}/api/provider/asset?exp_id=UC05&asset_type=dataset",
 					"protocol": "http",
 					"host": [
 						"{{agent-endpoint-ip-edge}}"
@@ -124,7 +124,7 @@
 					"query": [
 						{
 							"key": "exp_id",
-							"value": "UC01"
+							"value": "UC05"
 						},
 						{
 							"key": "asset_type",
@@ -141,7 +141,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{agent-endpoint-ip-mlops}}:{{agent-endpoint-port}}/api/consumer/asset?exp_id=UC01&asset_type=dataset&provider_ip=34.251.246.165",
+					"raw": "http://{{agent-endpoint-ip-mlops}}:{{agent-endpoint-port}}/api/v2/consumer/asset?exp_id=UC01&provider_ip=34.251.246.165",
 					"protocol": "http",
 					"host": [
 						"{{agent-endpoint-ip-mlops}}"
@@ -149,6 +149,7 @@
 					"port": "{{agent-endpoint-port}}",
 					"path": [
 						"api",
+						"v2",
 						"consumer",
 						"asset"
 					],
@@ -158,12 +159,35 @@
 							"value": "UC01"
 						},
 						{
-							"key": "asset_type",
-							"value": "dataset"
-						},
-						{
 							"key": "provider_ip",
 							"value": "34.251.246.165"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getDataset",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{agent-endpoint-ip-local}}:{{agent-endpoint-port}}/api/v2/dataset?exp_id=Clarus_Redwine_experiment",
+					"protocol": "http",
+					"host": [
+						"{{agent-endpoint-ip-local}}"
+					],
+					"port": "{{agent-endpoint-port}}",
+					"path": [
+						"api",
+						"v2",
+						"dataset"
+					],
+					"query": [
+						{
+							"key": "exp_id",
+							"value": "Clarus_Redwine_experiment"
 						}
 					]
 				}
