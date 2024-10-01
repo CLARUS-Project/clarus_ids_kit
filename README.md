@@ -82,7 +82,7 @@ The connector also needs another certificate to be able to share data with the c
  The following steps and examples describe the sequence of operations. The names in italics and bold are only as examples.
 1.	Create certificate for sharing with DAPS
 
-    openssl req -x509 -nodes -newkey rsa:2048 -keyout ***xx-daps-edge***.key -out ***xx-daps-edge***.cert -sha256 -days 365 -subj "/C=***ES***/ST=***Spain***/L=***GI***/O=***IKERLAN***/OU=***IPD***/CN=***xx-daps-edge-cn***” -addtext "subjectAltName = DNS:***your public DNS or IP***" 
+    openssl req -x509 -nodes -newkey rsa:2048 -keyout ***xx-daps-edge***.key -out ***xx-daps-edge***.cert -sha256 -days 365 -subj "/C=***ES***/ST=***Spain***/L=***GI***/O=***IKERLAN***/OU=***IPD***/CN=***xx-daps-edge-cn***” -addext "subjectAltName = DNS:***your public DNS or IP***" 
     
 2.	Send ***xx-daps-edge***.cert to DAPS operator (luigi.dicorrado@eng.it)
 
@@ -111,7 +111,7 @@ The following steps and examples describe the sequence of operations. The names 
 1.	Create public/private key in keystore
 
     
-    keytool -genkey -alias ***xx-tc-edge*** -keyalg RSA -keypass changeit -storepass changeit -keystore ssl-server.jks -ext SAN=ip:***your public IP***, dns:uc-dataapp-provider,dns:ecc-provider,dns:be-dataapp-provider 
+    keytool -genkey -alias ***xx-tc-edge*** -keyalg RSA -keypass changeit -storepass changeit -keystore ssl-server.jks -ext SAN=ip:***your public IP***,dns:uc-dataapp-provider,dns:ecc-provider,dns:be-dataapp-provider 
     
 2.	Export certificate. 
 
@@ -157,7 +157,7 @@ KEYSTORE_PASSWORD=changeit
 ALIAS=<<ALIAS>>
  ````
 
-- DAPS settings. Name, password and alias for the certificate used to register in DAPS. See [DAPS certificate generation](#daps-certificate-generation) section
+- DAPS settings. Name, password and alias for the certificate used to register in DAPS. See [DAPS certificate generation](#daps-certificate-generation) section. The DAPS CERTIFICATE ALIAS shall be the ***preferred_name*** used in step 3 of the section.
 
 ````
 #DAPS certificate configuration
