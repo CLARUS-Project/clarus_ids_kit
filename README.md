@@ -231,7 +231,7 @@ You can use the REGISTER menu to register a new dataset in the ids connector. Cl
 - Type: Choose dataset from the combobox
 - MinioEndpoint: IP and port of the MiniIO server where the datasets are saved (<<IP>>:<<port>>)
 - Bucket: Bucket where the dataset is saved. (i.e datasets)
-- Path: path of the dataset. (i.e usecase01\mydataset.csv)
+- Path: path of the dataset. (i.e usecase01/mydataset.csv)
 
 When click in an ids resource, it is posible to stop sharing the dataset through ids just by clicking on the DELETE button
 ![hmi_03](images/HMI_03.png)
