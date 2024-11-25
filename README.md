@@ -1,6 +1,6 @@
 # clarus_ids_kit
 
-This repository contains the docker-compose file and the configuration files and folders needed to deploy (as a provider connector) a TRueConnector using SFTP protocol  and a clarus agent to manage the connector and register clarus assets ( datasets, models, docker compose files).
+This repository contains the docker-compose file and the configuration files and folders needed to deploy  a TRueConnector using SFTP protocol  and a clarus agent to manage the connector and register clarus assets (datasets). This TRueConnector uses WSS Protocol to communicate with other TRueConnectors, for this reason it can not be configured as both provider and consumer. In this repository, the connector is configured by default as a provider but it can be configured as consumer just by changing one property.
 The repository also contains an additional docker compose file to deploy also a MinIO server that can be used to save the pilots datasets.
 
 
@@ -15,12 +15,14 @@ The repository also contains an additional docker compose file to deploy also a 
     - [Certificates generation](#certificates-generation)
       - [DAPS certificate generation](#daps-certificate-generation)
       - [TRue Connector certificate generation](#true-connector-certificate-generation)
+      - [MetadataBroker interaction certificate](#metadatabroker-interaction-certificate)
     - [Configuration](#configuration)
       - [Ecc properties configuration](#ecc-properties-configuration)
       - [Datapp properties configuration](#datapp-properties-configuration)
       - [Environment variables configuration](#environment-variables-configuration)
     - [Start services](#start-services)
   - [How to share datasets within Clarus Data Space](#how-to-share-datasets-within-clarus-data-space)
+  - [How to Query MetadataBroker](#how-to-query-metadatabroker)
 
 ## Requirements
 - Linux machine with public IP with 8 GB RAM and 70 GB Disk 
@@ -130,10 +132,36 @@ The following steps and examples describe the sequence of operations. The names 
 5.	Import in your truststore
     
     keytool -import -v -trustcacerts -alias ***xx-tc-mlops*** -file ***xx-tc-mlops***.cer -keystore truststoreEcc.jks -keypass changeit -storepass allpassword
+
+#### MetadataBroker interaction certificate 
+
+Needed when the interaction with the MetadaBroker is enabled.
+
+1.	Open a Browser, go to https://broker.mvds-clarus.eu and download the certificate, then load this certificate into the connector Trustore.
+
+2.	Import certificate in your truststore
+
+    keytool -import -v -trustcacerts -alias broker.mvds-clarus.eu -file broker.mvds-clarus.eu.crt -keystore truststoreEcc.jks -keypass changeit -storepass allpassword
+
 ### Configuration
 Several configuration files are needed to adjust the behaviour of the various TrueConnector components.  In addition, an environment variables file eases this configuration.
 #### Ecc properties configuration
-The ecc configuration files can be found in the ecc_resources_provider folder.  The TRueConnector execution core (ecc) is configured to use the DAPS of the Clarus dataspace (mvds-clarus.eu) as identity provider. The ecc is also configured to use the web sockets protocol as ids protocol. The default values of these files are fine and no modification is required.
+The ecc configuration files can be found in the ecc_resources_provider folder (application-docker-properties).  This TRueConnector execution core (ecc) is configured to use the DAPS of the Clarus dataspace (mvds-clarus.eu) as identity provider. This ecc is also configured to use the web sockets protocol as ids protocol. This TRueConnector is also configured as a provider connector. The default values of these files are fine and no modification is required.
+
+It is possible to configure this TRueConnector as a consumer connector. To do that it is only needed to modify a parameter in the configuration file  as below.
+````
+#Define if the connector is used as receiver or sender
+application.isReceiver=false
+````
+
+It is not possible to update in the MetadataBroker the connector self-description using the API provided by the TrueConnector proxy because in Clarus the connector is using wss protocol. The option is to enable the interaction with the MetadaBroker by setting the broker parameter "registrateOnStartup" to true. This means that every time the ecc starts up, the self description of the connector will be updated in the Metadabroker. This means that whenever resources are updated in the connector, the ecc must be relaunched in order to have the Metadabroker updated as well. 
+
+```
+# BROKER
+application.selfdescription.registrateOnStartup=true
+application.selfdescription.brokerURL=${BROKER_URL}
+   ```
+
 #### Datapp properties configuration
 The dataapp configuration files can be found in the be-dataapp_resources folder. The default values are fine and only the settings regarding the SFTP server need to be set in the file application-docker.properties.
   - The public IP where the SFTP server is available needs to be set (public IP of the machine where the conector is deployed). 
@@ -235,3 +263,40 @@ You can use the REGISTER menu to register a new dataset in the ids connector. Cl
 
 When click in an ids resource, it is posible to stop sharing the dataset through ids just by clicking on the DELETE button
 ![hmi_03](images/HMI_03.png)
+
+## How to Query MetadataBroker 
+
+To query the Metadata Broker using the UI, open a browser and visit https://broker.mvds-clarus.eu/fuseki , move to “dataset” page where it’s possible to write a SPARQL query and fetch results.
+
+It is possible to get:
+1. List of all registered connectors. Use next query:
+
+````
+SELECT ?s ?p ?o WHERE { GRAPH ?o { ?s ?p ids:BaseConnector } }
+````
+The result of this query will be a list of connectors and their registered ID
+
+2. Explore the high level nodes of a specific connector self description looking for the description of a concrete resource. Use next query:
+   
+````
+SELECT DISTINCT ?s ?p ?o WHERE { GRAPH ?s { <CONNECTOR ID> ?p ?o } }
+````
+The result will show a list of object related to the self description of the selected connector.
+
+As an example once the connector with ID -444341879 is dicovered in step 1, a query to explore its self-description is requested
+````
+SELECT DISTINCT ?s ?p ?o WHERE { GRAPH ?s { <https://broker.mvds-clarus.eu/connectors/-444341879> ?p ?o } }
+````
+The result will show a list of object related to the self description of the selected connector, in this case, the image below highlight the object "ids:resourceCatalog" which have the ID <https://broker.mvds-clarus.eu/connectors/-444341879/-2565144>. 
+
+![meta1](images/Meta1.png)
+
+Next step will be to explore the content of the catalog looking for the  offered resources
+````
+SELECT DISTINCT ?s ?p ?o WHERE { GRAPH ?s { <https://broker.mvds-clarus.eu/connectors/-444341879/-2565144> ?p ?o } }
+````
+The result will be a list of Offered resources that are contained inside the catalog.
+![meta2](images/Meta2.png)
+
+Finally the offered resources description can be explored looking for one specific resource ID
+![meta3](images/Meta3.png)

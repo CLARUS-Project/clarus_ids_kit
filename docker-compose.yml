@@ -151,7 +151,7 @@ services:
   clarus_ids_agent:
     
     # build: .
-    image: clarusproject/clarus_ids_agent:v0.0.2
+    image: clarusproject/clarus_ids_agent:v0.0.3
     hostname: clarus_ids_agent
     container_name: clarus_ids_agent
      
