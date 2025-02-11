@@ -1,8 +1,6 @@
 # clarus_ids_kit
 
-This repository contains the docker-compose file and the configuration files and folders needed to deploy  a TRueConnector using SFTP protocol  and a clarus agent to manage the connector and register clarus assets (datasets). This TRueConnector uses WSS Protocol to communicate with other TRueConnectors, for this reason it can not be configured as both provider and consumer. In this repository, the connector is configured by default as a provider but it can be configured as consumer just by changing one property.
-The repository also contains an additional docker compose file to deploy also a MinIO server that can be used to save the pilots datasets.
-
+This repository contains the docker-compose file and the configuration files and folders needed to deploy the software components that enable a participant in the Clarus Data Space to share or consume data. 
 
 ## Table of Contents <!-- omit in toc -->
 

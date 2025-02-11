@@ -54,55 +54,7 @@ services:
     extra_hosts:
       - "ecc-provider:172.17.0.1"
 
-  uc-dataapp-provider:
-    image: rdlabengpa/ids_uc_data_app_platoon:v1.7.5
-    deploy:
-      resources:
-        limits:
-          cpus: "1"
-          memory: 512M
-    logging:
-      options:
-        max-size: "100M"
-    networks:
-      - clarus_network
-    container_name: uc-dataapp-provider
-    environment:
-      - "JDK_JAVA_OPTIONS=-Xmx512m"
-      - ECC_PORT=8449
-      - ECC_SELF_DESCRIPTION_URL=${PROVIDER_ECC_SELF_DESCRIPTION_URL}
-      - KEYSTORE_NAME=${KEYSTORE_NAME}
-      - KEY_PASSWORD=${KEY_PASSWORD}
-      - KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
-      - ALIAS=${ALIAS}
-      - TZ=Europe/Rome
-    expose:
-      - "8080"
-    volumes:
-      - ./uc-dataapp_resources_provider:/etc
-      - uc_provider_data:/data
-      - ./ecc_cert:/cert
-
-  uc-dataapp-pip-provider:
-    image: rdlabengpa/ids_uc_data_app_platoon_pip:v1.0.0
-    deploy:
-      resources:
-        limits:
-          cpus: "1"
-          memory: 256M
-    logging:
-      options:
-        max-size: "100M"
-    networks:
-      - clarus_network
-    container_name: uc-dataapp-pip-provider
-    environment:
-      - "JDK_JAVA_OPTIONS=-Xmx256m"
-      - TZ=Europe/Rome
-    expose:
-      - "8085"
-    volumes:
-      - ./uc-dataapp-pip_resources_provider:/etc
+  
 
   be-dataapp-provider:
     #image: rdlabengpa/ids_be_data_app:v0.3.2
@@ -143,15 +95,118 @@ services:
       - FIREWALL=${PROVIDER_DATA_APP_FIREWALL}
 
     volumes:
-      - ./be-dataapp_resources:/config
+      - ./be-dataapp_resources_provider:/config
       #- be_dataapp_provider_data:/home/nobody/data/
       - ./be-dataapp_data_provider:/home/nobody/data/datalake
       - ./ecc_cert:/cert
-     
+  
+
+
+
+  ecc-consumer:
+    image: rdlabengpa/ids_execution_core_container:v1.14.3
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1024M
+    logging:
+      options:
+        max-size: "200M"
+    networks:
+      - clarus_network
+
+    container_name: ecc-consumer
+    ports:
+      - "${CONSUMER_PORT}:8449" #Port for exposing HTTP endpoints
+      - "8890:8889" #Exposed port for receiving data from another connector (REST)
+      - "8087:8086" #Exposed port for receiving data from another connector (WS)
+    environment:
+      - "JDK_JAVA_OPTIONS=-Xmx1024m"
+      - "SPRING_PROFILES_ACTIVE=docker"
+      - DATA_APP_ENDPOINT=${CONSUMER_DATA_APP_ENDPOINT} #Data APP enpoint for consuming received data
+      - MULTIPART_EDGE=${CONSUMER_MULTIPART_EDGE} #Data APP endpoint multipart/mixed content type
+      - MULTIPART_ECC=${MULTIPART_ECC}
+      - CONNECTOR_ID=${CONSUMER_ISSUER_CONNECTOR_URI}
+      - IDSCP2=${IDSCP2}
+      - WS_EDGE=${CONSUMER_WS_EDGE}
+      - WS_ECC=${WS_ECC}
+      - UC_DATAAPP_URI=https://uc-dataapp-consumer:8080/platoontec/PlatoonDataUsage/1.0/
+      - BROKER_URL=${BROKER_URL}
+      - CACHE_TOKEN=${CACHE_TOKEN}
+      - FETCH_TOKEN_ON_STARTUP=${FETCH_TOKEN_ON_STARTUP}
+      - KEYSTORE_NAME=${KEYSTORE_NAME}
+      - KEY_PASSWORD=${KEY_PASSWORD}
+      - KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
+      - ALIAS=${ALIAS}
+      - DAPS_KEYSTORE_NAME=${CONSUMER_DAPS_KEYSTORE_NAME}
+      - DAPS_KEYSTORE_PASSWORD=${CONSUMER_DAPS_KEYSTORE_PASSWORD}
+      - DAPS_KEYSTORE_ALIAS=${CONSUMER_DAPS_KEYSTORE_ALIAS}
+      - TRUSTORE_NAME=${TRUSTORE_NAME}
+      - TRUSTORE_PASSWORD=${TRUSTORE_PASSWORD}
+      - FIREWALL=${PROVIDER_ECC_FIREWALL}
+      - TZ=Europe/Rome
+
+    expose:
+       - "8887"
+
+    volumes:
+      - ./ecc_resources_consumer:/config
+      - ./ecc_cert:/cert
+      - ecc_consumer_data:/home/nobody/data/
+    extra_hosts:
+      - "ecc-consumer:172.17.0.1"
+
+  
+
+  be-dataapp-consumer:
+    #image: rdlabengpa/ids_be_data_app:v0.3.2
+    image: clarusproject/clarus_data_stfp_app:0.0.3
+    #image: clarus_webserver_data_app:0.1.0
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+    logging:
+      options:
+        max-size: "100M"
+    networks:
+      - clarus_network
+    container_name: be-dataapp-consumer
+    ports:
+      - "8184:8183"
+      - "2224:2223"
+    expose:
+      - "9000"
+    environment:
+      - "JDK_JAVA_OPTIONS=-Xmx512m"
+      - "SPRING_PROFILES_ACTIVE=docker"
+      - DATA_APP_MULTIPART=${CONSUMER_MULTIPART_EDGE}
+      - CONNECTOR_ID=${CONSUMER_ISSUER_CONNECTOR_URI}
+      - KEYSTORE_NAME=${KEYSTORE_NAME}
+      - KEY_PASSWORD=${KEY_PASSWORD}
+      - KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
+      - TRUSTORE_NAME=${TRUSTORE_NAME}
+      - TRUSTORE_PASSWORD=${TRUSTORE_PASSWORD}
+      - ALIAS=${ALIAS}
+      - ECC_HOSTNAME=ecc-consumer
+      - EXTRACT_PAYLOAD_FROM_RESPONSE=${EXTRACT_PAYLOAD_FROM_RESPONSE}
+      - ECC_PORT=8887
+      - TZ=Europe/Rome
+      - ISSUER_CONNECTOR_URI=${CONSUMER_ISSUER_CONNECTOR_URI}
+      - FIREWALL=${CONSUMER_DATA_APP_FIREWALL}
+
+    volumes:
+      - ./be-dataapp_resources_consumer:/config
+      #- be_dataapp_provider_data:/home/nobody/data/
+      - ./be-dataapp_data_consumer:/home/nobody/data/datalake
+      - ./ecc_cert:/cert
+
   clarus_ids_agent:
     
     # build: .
-    image: clarusproject/clarus_ids_agent:v0.0.3
+    image: clarusproject/clarus_ids_agent:v0.0.4
     hostname: clarus_ids_agent
     container_name: clarus_ids_agent
      
@@ -195,13 +250,41 @@ services:
           - clarus_network
 
 
+  minio:
+     
+     image: minio/minio
+     hostname: minio
+     container_name: minio
+     ports:
+      - "9000:9000"
+      - "9001:9001"
+      
+     environment:
+      - MINIO_ROOT_USER=${MINIO_USERNAME}
+      - MINIO_ROOT_PASSWORD=${MINIO_PASSWORD}
+      
+     volumes:
+      - 'minio_data:/data'
+      
+     networks:
+      - clarus_network
+      
+     command: minio server /data --console-address ":9001" --address ':9000' 
+      
+       
+       
+  
+
+
+
 networks:
   clarus_network: { }
 
 
 volumes:
     ecc_provider_data: {}
-    uc_provider_data: {}
+    ecc_consumer_data: {}
+    minio_data: {}
+    minio_config: {}
     #be_dataapp_provider_data:
      #external: true
-   
