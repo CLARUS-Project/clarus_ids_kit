@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "b34e0343-f225-4914-b4ca-647894c4af27",
+		"_postman_id": "6dd18f5e-521f-4035-a561-7a5bd1ac82b2",
 		"name": "ClarusIdsAgent",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "6046175"
@@ -12,12 +12,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{agent-endpoint-ip-local}}:{{agent-endpoint-port}}/api/ping",
+					"raw": "http://{{clarus_ids_kit_ip}}:8082/api/ping",
 					"protocol": "http",
 					"host": [
-						"{{agent-endpoint-ip-local}}"
+						"{{clarus_ids_kit_ip}}"
 					],
-					"port": "{{agent-endpoint-port}}",
+					"port": "8082",
 					"path": [
 						"api",
 						"ping"
@@ -27,17 +27,17 @@
 			"response": []
 		},
 		{
-			"name": "getExpIDSDescription",
+			"name": "getOwnConnectorExpIDSDescription",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{agent-endpoint-ip-edge}}:{{agent-endpoint-port}}/api/provider/asset?exp_id={TO-COMPLETE}",
+					"raw": "http://{{clarus_ids_kit_ip}}:8082/api/provider/asset?exp_id={TO-COMPLETE}",
 					"protocol": "http",
 					"host": [
-						"{{agent-endpoint-ip-edge}}"
+						"{{clarus_ids_kit_ip}}"
 					],
-					"port": "{{agent-endpoint-port}}",
+					"port": "8082",
 					"path": [
 						"api",
 						"provider",
@@ -54,17 +54,17 @@
 			"response": []
 		},
 		{
-			"name": "getAllExpIdDescription",
+			"name": "getOwnConnectorAllExpIdDescription",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{agent-endpoint-ip-edge}}:{{agent-endpoint-port}}/api/provider/assets",
+					"raw": "http://{{clarus_ids_kit_ip}}:8082/api/provider/assets",
 					"protocol": "http",
 					"host": [
-						"{{agent-endpoint-ip-edge}}"
+						"{{clarus_ids_kit_ip}}"
 					],
-					"port": "{{agent-endpoint-port}}",
+					"port": "8082",
 					"path": [
 						"api",
 						"provider",
@@ -89,12 +89,42 @@
 					}
 				},
 				"url": {
-					"raw": "http://{{agent-endpoint-ip-edge}}:{{agent-endpoint-port}}/api/provider/asset",
+					"raw": "http://{{clarus_ids_kit_ip}}:8082/api/provider/asset",
 					"protocol": "http",
 					"host": [
-						"{{agent-endpoint-ip-edge}}"
+						"{{clarus_ids_kit_ip}}"
 					],
-					"port": "{{agent-endpoint-port}}",
+					"port": "8082",
+					"path": [
+						"api",
+						"provider",
+						"asset"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updateExpIDAsset",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"exp_id\": \"Clarus_RedWine_experiment\",\r\n  \"minio_bucket\": \"datasets\",\r\n  \"minio_path\": \"uc_wine/winequality-red.csv\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{clarus_ids_kit_ip}}:8082/api/provider/asset",
+					"protocol": "http",
+					"host": [
+						"{{clarus_ids_kit_ip}}"
+					],
+					"port": "8082",
 					"path": [
 						"api",
 						"provider",
@@ -110,12 +140,12 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://{{agent-endpoint-ip-edge}}:{{agent-endpoint-port}}/api/provider/asset?exp_id=UC05&asset_type=dataset",
+					"raw": "http://{{clarus_ids_kit_ip}}:8082/api/provider/asset?exp_id={TO-COMPLETE}&asset_type=dataset",
 					"protocol": "http",
 					"host": [
-						"{{agent-endpoint-ip-edge}}"
+						"{{clarus_ids_kit_ip}}"
 					],
-					"port": "{{agent-endpoint-port}}",
+					"port": "8082",
 					"path": [
 						"api",
 						"provider",
@@ -124,70 +154,11 @@
 					"query": [
 						{
 							"key": "exp_id",
-							"value": "UC05"
+							"value": "{TO-COMPLETE}"
 						},
 						{
 							"key": "asset_type",
 							"value": "dataset"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "getAssetArtifact",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://{{agent-endpoint-ip-mlops}}:{{agent-endpoint-port}}/api/v2/consumer/asset?exp_id=UC01&provider_ip=34.251.246.165",
-					"protocol": "http",
-					"host": [
-						"{{agent-endpoint-ip-mlops}}"
-					],
-					"port": "{{agent-endpoint-port}}",
-					"path": [
-						"api",
-						"v2",
-						"consumer",
-						"asset"
-					],
-					"query": [
-						{
-							"key": "exp_id",
-							"value": "UC01"
-						},
-						{
-							"key": "provider_ip",
-							"value": "34.251.246.165"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "getDataset",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://{{agent-endpoint-ip-local}}:{{agent-endpoint-port}}/api/v2/dataset?exp_id=Clarus_Redwine_experiment",
-					"protocol": "http",
-					"host": [
-						"{{agent-endpoint-ip-local}}"
-					],
-					"port": "{{agent-endpoint-port}}",
-					"path": [
-						"api",
-						"v2",
-						"dataset"
-					],
-					"query": [
-						{
-							"key": "exp_id",
-							"value": "Clarus_Redwine_experiment"
 						}
 					]
 				}
