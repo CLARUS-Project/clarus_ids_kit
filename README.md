@@ -19,14 +19,15 @@ This repository contains the docker-compose file and the configuration files and
       - [Datapp properties configuration](#datapp-properties-configuration)
       - [Environment variables configuration](#environment-variables-configuration)
     - [Start services](#start-services)
-  - [How to share datasets within Clarus Data Space](#how-to-share-datasets-within-clarus-data-space)
+  - [How to share datasets through Clarus Data Space](#how-to-share-datasets-through-clarus-data-space)
   - [How to Query MetadataBroker](#how-to-query-metadatabroker)
-
+  - [How to consume data through Clarus Data Space](#how-to-consume-data-through-clarus-data-space)
+  
 ## Requirements
 - Linux machine with public IP with 8 GB RAM and 70 GB Disk 
 - Docker version 23.0.5 or above installed
 - Docker-compose version 1.29.2 or above installed
-- Open ports: 8086, 2223 & 8082
+- Open ports: 8086, 2223 
 ## Components
 Next figure shows the components that are part of the clarus_ids_kit.
 
@@ -34,13 +35,15 @@ Next figure shows the components that are part of the clarus_ids_kit.
 
 A brief description of the clarus_ids_kit components:
 
-- TRueConnector A complete description of TrueConnector can be found [here](https://github.com/Engineering-Research-and-Development/true-connector)
+- TRueConnector Provider: TRUE Connector configured a provider. clarus_ids_kit users at pilots edge uses this connector to share datasets through Clarus Data Space. clarus_ids_kit users (dags) at MLOps platform uses this connector to share inference service metadata through Clarus Data Space.  A complete description of TrueConnector can be found [here](https://github.com/Engineering-Research-and-Development/true-connector)
 
-- clarus_ids_agent: service that provides diferent endpoints to make easier the management of TRueConnector. It is also in charge of moving datasets from MinIO to dataapp datalake.
+- TRueConnector Consumer: TRUE Connector configured a consumer. Clarus_ids_kit users at pilots edge uses this connector to get inference service metadata through Clarus DataSpace. Clarus_ids_kit users (dag pipelines) at MLOps platform uses this connector to get datasets through Clarus DataSpace.  
 
-- clarus-hmi: Frontend that consumes clarus_ids_agent endpoints. It allows the user to register, delete and view the metamodel for shared datasets within the Clarus Data Space.
+- clarus_ids_agent: service that provides diferent endpoints to make easier the management of TRueConnector. clarus_ids_kit requests ecc_provider to register datasets ot service inference metadata. It is also in charge of moving datasets from MinIO to dataapp datalake. clarus_ids_kit requests be-dataapp to transfer datasets or inference service metadata from another connector.
 
-- MinIO server: Optional component that can be used by pilot to save their datasets instead of using its own.
+- clarus-hmi: Frontend that consumes clarus_ids_agent endpoints. It allows the user to register, delete and view the metamodel for shared datasets thrpugh the Clarus Data Space.
+
+- MinIO server: Optional component that can be used by pilots to save their datasets instead of using their own.
   
 ## Deployment 
 The content needed for the deployment is available in the Clarus github repository https://github.com/CLARUS-Project and the images used are in the Clarus docker hub repository https://hub.docker.com/repositories/clarusproject.
@@ -54,22 +57,22 @@ Once repository is cloned you should see next folder tree
 
 ![Folders_and_files](images/Folders_and_files.png)
 
-- be-dataapp_data_consumer: Not used currently
-- be-dataapp_data_provider: Folder used as datalake by the SFTP server started by the dataapp TRueConnector component.
-- be-dataapp_resources: Folder where the properties files used by the dataapp are located
+- be-dataapp_data_consumer: Folder used to save the data files consumed from another connector
+- be-dataapp_data_provider: Folder used as datalake by the SFTP server started by the dataapp TRueConnector component. This folder is used to save files to share.
+- be-dataapp_resources_consumer: Folder where the properties files used by the consumer dataapp are located
+- be-dataapp_resources_provider: Folder where the properties files used by the provider dataapp are located
 - ecc_cert: Folder to save the certificates keystore and truststore
-- ecc_reources_provider: Folder where the properties files used by the ecc are located
-- images: Not relevant. Images for the Readme file
-- uc-dataapp_pip_resources_provider: Folder where the properties files used by the uc-dataapp-pip-provider are located. Currently, usage control components are not used. 
+- ecc_resources_consumer: Folder where the properties files used by the consumer ecc are located
+- ecc_resources_provider: Folder where the properties files used by the provider ecc are located
+- uc-dataapp_pip_resources_consumer: Folder where the properties files used by the uc-dataapp-pip-consumer are located. Currently, usage control components are not used. 
+- uc-dataapp_pip_resources_provider: Folder where the properties files used by the uc-dataapp-pip-provider are located. Currently, usage control components are not used.
+- uc-dataapp_resources_consumer: Folder where the properties files used by the uc-dataapp-consumer are located. Currently, usage control components are not used. 
 - uc-dataapp_resources_provider: Folder where the properties files used by the uc-dataapp-provider are located. Currently, usage control components are not used.
 - .env: Enviromental: variables needed to configure all the components
-- docker-compose.yml: File to start all the services. By default, it contains same services as docker-compose-basic.yml
-- docker-compose-basic.yml: File with the basic services. (ecc-provider,uc-dataapp-provider,be-dataapp-provideruc-dataapp-pip-provider,clarus_ids_agent)
-- docker-compose-minio.yml: MinIO server is added to the basic services
-- prepopulate_be_dataapp_data_provider.sh: Not used currently
+- docker-compose-completo.yml: File to start all the services including usage control components
+- docker-compose.yml: File to start all the services without usage control components
 - renew_daps_certificate.sh: script to renew the Daps certificate when it expires.
-- ClarusIdsAgent.postman_collection: Collection that can be imported in Postman tool to make easier the registration of clarus assets. These requests will be used by the clarus-hmi. It is possible to use Postman instead of clarus-hmi. 
-- TRUE Connector v1.postman_collection: Collection that can be imported in Postman tool to manage directly the TRueConnector. Not needed if you use the ClarusIdsAgent.postman_collection.
+- TRUE Connector v1.postman_collection: Collection that can be imported in Postman tool to manage directly the TRueConnector. 
 
   
 **Make sure permissions for folder ecc_cer & be-dataapp_data_provider are set to 777**
@@ -144,13 +147,7 @@ Needed when the interaction with the MetadaBroker is enabled.
 ### Configuration
 Several configuration files are needed to adjust the behaviour of the various TrueConnector components.  In addition, an environment variables file eases this configuration.
 #### Ecc properties configuration
-The ecc configuration files can be found in the ecc_resources_provider folder (application-docker-properties).  This TRueConnector execution core (ecc) is configured to use the DAPS of the Clarus dataspace (mvds-clarus.eu) as identity provider. This ecc is also configured to use the web sockets protocol as ids protocol. This TRueConnector is also configured as a provider connector. The default values of these files are fine and no modification is required.
-
-It is possible to configure this TRueConnector as a consumer connector. To do that it is only needed to modify a parameter in the configuration file  as below.
-````
-#Define if the connector is used as receiver or sender
-application.isReceiver=false
-````
+The ecc configuration files can be found in the ecc_resources_provider and ecc_resources_consumer folders. (application-docker-properties).  This TRueConnector execution core (ecc) is configured to use the DAPS of the Clarus dataspace (mvds-clarus.eu) as identity provider. This ecc is also configured to use the web sockets protocol as ids protocol. 
 
 It is not possible to update in the MetadataBroker the connector self-description using the API provided by the TrueConnector proxy because in Clarus the connector is using wss protocol. The option is to enable the interaction with the MetadaBroker by setting the broker parameter "registrateOnStartup" to true. This means that every time the ecc starts up, the self description of the connector will be updated in the Metadabroker. This means that whenever resources are updated in the connector, the ecc must be relaunched in order to have the Metadabroker updated as well. 
 
@@ -161,8 +158,8 @@ application.selfdescription.brokerURL=${BROKER_URL}
    ```
 
 #### Datapp properties configuration
-The dataapp configuration files can be found in the be-dataapp_resources folder. The default values are fine and only the settings regarding the SFTP server need to be set in the file application-docker.properties.
-  - The public IP where the SFTP server is available needs to be set (public IP of the machine where the conector is deployed). 
+The dataapp configuration files can be found in the be-dataapp_resources_provider and be-dataapp_resources_consumer folders. The default values are fine and only the settings regarding the SFTP server need to be set in the file application-docker.properties.
+  - The public IP where the SFTP server is available needs to be set in the be-dataapp_resources_provider (public IP of the machine where the conector is deployed). 
   
    ```
     #SFTP settings
@@ -186,11 +183,20 @@ ALIAS=<<ALIAS>>
 - DAPS settings. Name, password and alias for the certificate used to register in DAPS. See [DAPS certificate generation](#daps-certificate-generation) section. The DAPS CERTIFICATE ALIAS shall be the ***preferred_name*** used in step 3 of the section.
 
 ````
-#DAPS certificate configuration
-#When DAPS enabled, set next variables with DAPS certificate. AWS edge machine as an example
+#DAPS certificate configuration for provider
+#When DAPS enabled, set next variables with DAPS certificate. 
 PROVIDER_DAPS_KEYSTORE_NAME=<<DAPS CERTIFICATE>>
 PROVIDER_DAPS_KEYSTORE_PASSWORD=<<DAPS CERTIFICATE PASSWORD>>
 PROVIDER_DAPS_KEYSTORE_ALIAS=<<DAPS CERTIFICATE ALIAS>>
+
+ ````
+
+ ````
+#DAPS certificate configuration for consumer
+#When DAPS enabled, set next variables with DAPS certificate. 
+CONSUMER_DAPS_KEYSTORE_NAME=<<DAPS CERTIFICATE>>
+CONSUMER_DAPS_KEYSTORE_PASSWORD=<<DAPS CERTIFICATE PASSWORD>>
+CONSUMER_DAPS_KEYSTORE_ALIAS=<<DAPS CERTIFICATE ALIAS>>
 
  ````
 
@@ -235,7 +241,7 @@ You shall see next services up:
 
 ![clarus_ids_kit_services](images/clarus_ids_kit_services.png)
 
-## How to share datasets within Clarus Data Space
+## How to share datasets through Clarus Data Space
 
 Once the services are up and running clarus-hmi frontend is avilable in port 3000. Use an internet browser and navigate to:
 
@@ -298,3 +304,15 @@ The result will be a list of Offered resources that are contained inside the cat
 
 Finally the offered resources description can be explored looking for one specific resource ID
 ![meta3](images/Meta3.png)
+
+
+## How to consume data through Clarus Data Space
+
+clarus_ids_agent provides an API through port 8082 to init the sequence of requests needed to consume data using TRUEConnector consumer. This proccess covers the contract negotiation, contract agreement an finally data transfer.
+
+A user can execute this query http://clarus_ids_agent host IP:8082/api/v2/consumer/asset to get a given resource. 
+![api1](images/ids_agent_api.png)
+The payload contains information about the resource identifier and the provider connector ip.
+
+Read task in a dag, at MLOPs platform side, uses this API to get datasets through Clarus Data Space
+clarus_agent_node in clarus_inference_kit , at pilots side, uses this API to get the inference service metadata through Clarus Data Space and to find out from where to download the inference service.
