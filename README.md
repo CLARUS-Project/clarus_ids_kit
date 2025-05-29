@@ -167,7 +167,7 @@ By default use of Clearing House is not enabled. Ecc version v1.14.8 has problem
 # Clearing House
 application.clearinghouse.isEnabledClearingHouse=true
 ```
-Once enabled, it is mandatory to modify the ecc image version to v1.14.18 in the compose file before launching clarus ids services
+Once enabled, it is mandatory to modify the ecc image version to v1.14.8 in the compose file before launching clarus ids services
 
 ```
 version: '3.1'
