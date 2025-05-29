@@ -2,6 +2,7 @@ version: '3.1'
 services:
   ecc-provider:
     image: rdlabengpa/ids_execution_core_container:v1.14.3
+    #image: rdlabengpa/ids_execution_core_container:v1.14.8
     deploy:
       resources:
         limits:
