@@ -162,7 +162,7 @@ application.selfdescription.registrateOnStartup=true
 application.selfdescription.brokerURL=${BROKER_URL}
    ```
 
-By default use of Clearing House is not enabled. Ecc version v1.14.8 has problems when interacting with Clearing House. If the Clearing House needs to be enabled in the configuration 
+By default use of Clearing House is not enabled. Ecc version v1.14.3 has problems when interacting with Clearing House. If the Clearing House needs to be enabled in the configuration 
 ```
 # Clearing House
 application.clearinghouse.isEnabledClearingHouse=true
