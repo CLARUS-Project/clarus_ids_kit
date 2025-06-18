@@ -290,6 +290,8 @@ It is possible to get:
 1. List of all registered connectors. Use next query:
 
 ````
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX ids: <https://w3id.org/idsa/core/>
 SELECT ?s ?p ?o WHERE { GRAPH ?o { ?s ?p ids:BaseConnector } }
 ````
 The result of this query will be a list of connectors and their registered ID
@@ -297,12 +299,16 @@ The result of this query will be a list of connectors and their registered ID
 2. Explore the high level nodes of a specific connector self description looking for the description of a concrete resource. Use next query:
    
 ````
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX ids: <https://w3id.org/idsa/core/>
 SELECT DISTINCT ?s ?p ?o WHERE { GRAPH ?s { <CONNECTOR ID> ?p ?o } }
 ````
 The result will show a list of object related to the self description of the selected connector.
 
 As an example once the connector with ID -444341879 is dicovered in step 1, a query to explore its self-description is requested
 ````
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX ids: <https://w3id.org/idsa/core/>
 SELECT DISTINCT ?s ?p ?o WHERE { GRAPH ?s { <https://broker.mvds-clarus.eu/connectors/-444341879> ?p ?o } }
 ````
 The result will show a list of object related to the self description of the selected connector, in this case, the image below highlight the object "ids:resourceCatalog" which have the ID <https://broker.mvds-clarus.eu/connectors/-444341879/-2565144>. 
@@ -311,6 +317,8 @@ The result will show a list of object related to the self description of the sel
 
 Next step will be to explore the content of the catalog looking for the  offered resources
 ````
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX ids: <https://w3id.org/idsa/core/>
 SELECT DISTINCT ?s ?p ?o WHERE { GRAPH ?s { <https://broker.mvds-clarus.eu/connectors/-444341879/-2565144> ?p ?o } }
 ````
 The result will be a list of Offered resources that are contained inside the catalog.
