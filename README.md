@@ -17,9 +17,9 @@ The repository also contains an additional docker compose file to deploy also a 
       - [TRue Connector certificate generation](#true-connector-certificate-generation)
       - [MetadataBroker interaction certificate](#metadatabroker-interaction-certificate)
     - [Configuration](#configuration)
+      - [Environment variables configuration](#environment-variables-configuration)
       - [Ecc properties configuration](#ecc-properties-configuration)
       - [Datapp properties configuration](#datapp-properties-configuration)
-      - [Environment variables configuration](#environment-variables-configuration)
     - [Start services](#start-services)
   - [How to share datasets within Clarus Data Space](#how-to-share-datasets-within-clarus-data-space)
   - [How to Query MetadataBroker](#how-to-query-metadatabroker)
@@ -145,8 +145,79 @@ Needed when the interaction with the MetadaBroker is enabled.
 
 ### Configuration
 Several configuration files are needed to adjust the behaviour of the various TrueConnector components.  In addition, an environment variables file eases this configuration.
+
+#### Environment variables configuration
+The .env file contains the enviromental variables needed both for the TRueConnector & clarus agent.
+Only the sections regarding with TLS certificates, DAPS certiifcates, Connector identifier and agent configuration shall be modified.
+
+- TLS settings. Only the alias for the TrueConnector certificate needs to be set. See [TRue Connector certificate generation](#true-connector-certificate-generation) section
+ ````
+#TLS settings
+KEYSTORE_NAME=ssl-server.jks
+KEY_PASSWORD=changeit
+KEYSTORE_PASSWORD=changeit
+ALIAS=<<ALIAS>>
+ ````
+
+- DAPS settings. Name, password and alias for the certificate used to register in DAPS. See [DAPS certificate generation](#daps-certificate-generation) section. The DAPS CERTIFICATE ALIAS shall be the ***preferred_name*** used in step 3 of the section.
+
+````
+#DAPS certificate configuration
+#When DAPS enabled, set next variables with DAPS certificate. AWS edge machine as an example
+PROVIDER_DAPS_KEYSTORE_NAME=<<DAPS CERTIFICATE>>
+PROVIDER_DAPS_KEYSTORE_PASSWORD=<<DAPS CERTIFICATE PASSWORD>>
+PROVIDER_DAPS_KEYSTORE_ALIAS=<<DAPS CERTIFICATE ALIAS>>
+
+ ````
+
+- Connector Identifier. The connector identifier must be modified. This identifier will be used to uniquely register the connector's self-description in the MetadataBroker. Only the PROVIDER_ISSUER_CONNECTOR_URI property should be updated. The identifier value must follow the URI format. For example, http://w3id.org/engrd/connector/MyProvider.
+  
+````
+# In case of WSS configuration
+PROVIDER_DATA_APP_ENDPOINT=https://be-dataapp-provider:9000/incoming-data-app/routerBodyBinary
+PROVIDER_WS_EDGE=true
+PROVIDER_ISSUER_CONNECTOR_URI=<<Connector_ID>>
+PROVIDER_DATA_APP_FIREWALL=false
+PROVIDER_ECC_FIREWALL=false
+
+ ````
+
+
+
+- Agent settings. The agent needs to know how to reach the TRue Connector. While the agent is deployed in the same docker network as the TrueConnector the TRueConnector agent configuration variables don´t need to be modified. Endpoint, username and password for the MinIO server where datasets are stored have to be set.
+
+````
+#TRue Connector agent Configuration
+ECC_PROVIDER_IP=ecc-provider  
+ECC_PROVIDER_PORT=8449
+PROXY_CONSUMER_IP=be-dataapp-consumer
+PROXY_CONSUMER_PORT=8183
+ECC_CONSUMER_IP=ecc-consumer
+ECC_CONSUMER_PORT=8887
+ECC_PROVIDER_EXTERNAL_PORT=8086
+
+#MinIO agent Configuration
+MINIO_ENDPOINT=<<MinIO endpont>>
+MINIO_USERNAME=<<MinIO username>>
+MINIO_PASSWORD=<<MinIO password>>
+
+ ````
+
+
 #### Ecc properties configuration
 The ecc configuration files can be found in the ecc_resources_provider folder (application-docker-properties).  This TRueConnector execution core (ecc) is configured to use the DAPS of the Clarus dataspace (mvds-clarus.eu) as identity provider. This ecc is also configured to use the web sockets protocol as ids protocol. This TRueConnector is also configured as a provider connector. The default values of these files are fine and no modification is required.
+
+Although it is not mandatory, it is recommended to modify some of the attributes that describe the connector to facilitate its recognition when querying the MetadataBroker.
+
+```
+application.selfdescription.description=Data Provider Connector description
+application.selfdescription.title=Data Provider Connector title
+application.selfdescription.curator=http://provider.curatorURI.com
+application.selfdescription.maintainer=http://provider.maintainerURI.com
+application.selfdescription.filelocation=/home/nobody/data/sd
+application.selfdescription.inboundModelVersion=4.0.0,4.1.0,4.1.2,4.2.0,4.2.1,4.2.2,4.2.3,4.2.4,4.2.5,4.2.6,4.2.7
+application.selfdescription.defaultEndpoint=
+   ```
 
 It is possible to configure this TRueConnector as a consumer connector. To do that it is only needed to modify a parameter in the configuration file  as below.
 ````
@@ -179,7 +250,6 @@ services:
 
 
 
-
 #### Datapp properties configuration
 The dataapp configuration files can be found in the be-dataapp_resources folder. The default values are fine and only the settings regarding the SFTP server need to be set in the file application-docker.properties.
   - The public IP where the SFTP server is available needs to be set (public IP of the machine where the conector is deployed). 
@@ -190,49 +260,7 @@ The dataapp configuration files can be found in the be-dataapp_resources folder.
    ```
 
 
-#### Environment variables configuration
-The .env file contains the enviromental variables needed both for the TRueConnector & clarus agent.
-Only the sections regarding with TLS certificates, DAPS certiifcates and agent configuration shall be modified.
 
-- TLS settings. Only the alias for the TrueConnector certificate needs to be set. See [TRue Connector certificate generation](#true-connector-certificate-generation) section
- ````
-#TLS settings
-KEYSTORE_NAME=ssl-server.jks
-KEY_PASSWORD=changeit
-KEYSTORE_PASSWORD=changeit
-ALIAS=<<ALIAS>>
- ````
-
-- DAPS settings. Name, password and alias for the certificate used to register in DAPS. See [DAPS certificate generation](#daps-certificate-generation) section. The DAPS CERTIFICATE ALIAS shall be the ***preferred_name*** used in step 3 of the section.
-
-````
-#DAPS certificate configuration
-#When DAPS enabled, set next variables with DAPS certificate. AWS edge machine as an example
-PROVIDER_DAPS_KEYSTORE_NAME=<<DAPS CERTIFICATE>>
-PROVIDER_DAPS_KEYSTORE_PASSWORD=<<DAPS CERTIFICATE PASSWORD>>
-PROVIDER_DAPS_KEYSTORE_ALIAS=<<DAPS CERTIFICATE ALIAS>>
-
- ````
-
-
-- Agent settings. The agent needs to know how to reach the TRue Connector. While the agent is deployed in the same docker network as the TrueConnector the TRueConnector agent configuration variables don´t need to be modified. Endpoint, username and password for the MinIO server where datasets are stored have to be set.
-
-````
-#TRue Connector agent Configuration
-ECC_PROVIDER_IP=ecc-provider  
-ECC_PROVIDER_PORT=8449
-PROXY_CONSUMER_IP=be-dataapp-consumer
-PROXY_CONSUMER_PORT=8183
-ECC_CONSUMER_IP=ecc-consumer
-ECC_CONSUMER_PORT=8887
-ECC_PROVIDER_EXTERNAL_PORT=8086
-
-#MinIO agent Configuration
-MINIO_ENDPOINT=<<MinIO endpont>>
-MINIO_USERNAME=<<MinIO username>>
-MINIO_PASSWORD=<<MinIO password>>
-
- ````
 
 ### Start services
 Move to the folder where the repo has been cloned.
